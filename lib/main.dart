@@ -4,8 +4,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'view_services.dart';        // Import the view services screen
 import 'book_appointment.dart';     // Import the book appointment screen
 import 'profile.dart';              // Import the profile screen
+import 'GentleCuts.dart';           // Import Firebase connection file
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GentleCutsFirebase.initializeFirebase();  // Initialize Firebase
   runApp(GentleCutsApp());
 }
 
@@ -23,13 +26,90 @@ class GentleCutsApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool isAdminLoggedIn = false;  // To track if admin is logged in
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Gentle Cuts'),
         backgroundColor: Colors.blue[700],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue[700],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(LucideIcons.user, size: 60, color: Colors.white),
+                  SizedBox(height: 10),
+                  Text(
+                    isAdminLoggedIn ? 'Admin Panel' : 'User Panel',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
+            if (isAdminLoggedIn) ...[
+              ListTile(
+                leading: Icon(LucideIcons.layoutDashboard),
+                title: Text('Dashboard'),
+                onTap: () {
+                  // Navigate to Dashboard Screen (create a separate file for this if needed)
+                },
+              ),
+              ListTile(
+                leading: Icon(LucideIcons.settings),
+                title: Text('Manage Services'),
+                onTap: () {
+                  // Navigate to Manage Services Screen (create a separate file for this if needed)
+                },
+              ),
+              ListTile(
+                leading: Icon(LucideIcons.calendar),
+                title: Text('Appointments'),
+                onTap: () {
+                  // Navigate to Appointments Screen (create a separate file for this if needed)
+                },
+              ),
+              ListTile(
+                leading: Icon(LucideIcons.logOut),
+                title: Text('Logout'),
+                onTap: () {
+                  setState(() {
+                    isAdminLoggedIn = false;  // Log out admin
+                  });
+                  Navigator.pop(context);
+                },
+              ),
+            ] else ...[
+              ListTile(
+                leading: Icon(LucideIcons.logIn),
+                title: Text('Admin Login'),
+                onTap: () async {
+                  // Simple login simulation (replace with actual authentication)
+                  bool loggedIn = await _showAdminLoginDialog(context);
+                  if (loggedIn) {
+                    setState(() {
+                      isAdminLoggedIn = true;
+                    });
+                  }
+                },
+              ),
+            ],
+          ],
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -47,7 +127,6 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 30),
             ElevatedButton.icon(
               onPressed: () {
-                // Navigate to Book Appointment Screen
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => BookAppointmentScreen()),
@@ -63,7 +142,6 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 15),
             ElevatedButton.icon(
               onPressed: () {
-                // Navigate to View Services Screen
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ViewServicesScreen()),
@@ -79,7 +157,6 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 15),
             ElevatedButton.icon(
               onPressed: () {
-                // Navigate to Profile Screen
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ProfileScreen()),
@@ -96,5 +173,54 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<bool> _showAdminLoginDialog(BuildContext context) async {
+    TextEditingController usernameController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+    bool isLoggedIn = false;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Admin Login'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: usernameController,
+                decoration: InputDecoration(labelText: 'Username'),
+              ),
+              TextField(
+                controller: passwordController,
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Check admin credentials (replace with actual authentication)
+                if (usernameController.text == 'admin' &&
+                    passwordController.text == 'password') {
+                  isLoggedIn = true;
+                }
+                Navigator.pop(context);
+              },
+              child: Text('Login'),
+            ),
+          ],
+        );
+      },
+    );
+    return isLoggedIn;
   }
 }
