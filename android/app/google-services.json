@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "262644538458",
+    "project_id": "gentlecuts-e49a6",
+    "storage_bucket": "gentlecuts-e49a6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:262644538458:android:d883468d1b5ddd77018c63",
+        "android_client_info": {
+          "package_name": "com.example.gentle_cuts"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZykSQijpsFw2d39Oi4MZWsMf0VSu0z5Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
