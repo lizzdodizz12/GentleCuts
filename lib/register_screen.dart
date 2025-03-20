@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,7 +12,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
@@ -85,19 +85,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Register')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Center(
+      body: SingleChildScrollView( // ✅ Fix overflow issue
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start, // ✅ Align items properly
               children: [
-                Icon(LucideIcons.userPlus, size: 80, color: Colors.green[700]),
-                SizedBox(height: 20),
-                Text('Create Account', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                SizedBox(height: 10),
-                
+                Center(
+                  child: Column(
+                    children: [
+                      Icon(LucideIcons.userPlus, size: 80, color: Colors.green[700]),
+                      SizedBox(height: 20),
+                      Text(
+                        'Create Account',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+
                 // Username
                 TextFormField(
                   controller: usernameController,
@@ -109,7 +118,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 // Password
                 TextFormField(
                   controller: passwordController,
@@ -122,7 +131,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 // Confirm Password
                 TextFormField(
                   controller: confirmPasswordController,
@@ -135,7 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 // Phone Number
                 TextFormField(
                   controller: phoneController,

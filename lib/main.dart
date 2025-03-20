@@ -18,6 +18,7 @@ class GentleCutsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Gentle Cuts',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -89,6 +90,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // ⚠️ In production, passwords should be hashed
         if (userData['password'] == password) {
+          // ✅ Save the username in SharedPreferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('loggedInUsername', username);
+
           await _saveCredentials(username, password);
           Navigator.pushReplacement(
             context,
@@ -134,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
-              
+
               TextField(
                 controller: usernameController,
                 decoration: InputDecoration(labelText: 'Username'),
@@ -144,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: InputDecoration(labelText: 'Password'),
                 obscureText: true,
               ),
-              
+
               Row(
                 children: [
                   Checkbox(
