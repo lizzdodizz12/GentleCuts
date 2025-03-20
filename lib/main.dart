@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Added for saving credentials
 import 'firebase_options.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
@@ -35,6 +36,35 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  bool rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      usernameController.text = prefs.getString('saved_username') ?? '';
+      passwordController.text = prefs.getString('saved_password') ?? '';
+      rememberMe = prefs.getBool('remember_me') ?? false;
+    });
+  }
+
+  Future<void> _saveCredentials(String username, String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (rememberMe) {
+      await prefs.setString('saved_username', username);
+      await prefs.setString('saved_password', password);
+      await prefs.setBool('remember_me', true);
+    } else {
+      await prefs.remove('saved_username');
+      await prefs.remove('saved_password');
+      await prefs.remove('remember_me');
+    }
+  }
 
   void _login() async {
     String username = usernameController.text;
@@ -48,7 +78,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     try {
-      // Query Firestore for a user with the entered username
       QuerySnapshot userQuery = await FirebaseFirestore.instance
           .collection('users')
           .where('username', isEqualTo: username)
@@ -60,6 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // ⚠️ In production, passwords should be hashed
         if (userData['password'] == password) {
+          await _saveCredentials(username, password);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -104,6 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
+              
               TextField(
                 controller: usernameController,
                 decoration: InputDecoration(labelText: 'Username'),
@@ -113,6 +144,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: InputDecoration(labelText: 'Password'),
                 obscureText: true,
               ),
+              
+              Row(
+                children: [
+                  Checkbox(
+                    value: rememberMe,
+                    onChanged: (value) {
+                      setState(() {
+                        rememberMe = value!;
+                      });
+                    },
+                  ),
+                  Text("Remember me"),
+                ],
+              ),
+
               SizedBox(height: 20),
               ElevatedButton.icon(
                 onPressed: _login,

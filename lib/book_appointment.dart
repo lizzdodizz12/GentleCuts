@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookAppointmentScreen extends StatefulWidget {
   @override
@@ -12,6 +13,34 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  void _bookAppointment() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        await _firestore.collection('appointments').add({
+          'name': _nameController.text,
+          'date': _dateController.text,
+          'time': _timeController.text,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Appointment Booked Successfully!')),
+        );
+
+        // Clear form after successful booking
+        _nameController.clear();
+        _dateController.clear();
+        _timeController.clear();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,13 +132,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
               ),
               SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Appointment Booked!')),
-                    );
-                  }
-                },
+                onPressed: _bookAppointment,
                 child: Text('Confirm Appointment'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,

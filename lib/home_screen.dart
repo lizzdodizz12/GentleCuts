@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // For clearing saved login data
 import 'view_services.dart';
 import 'book_appointment.dart';
 import 'profile.dart';
+import 'main.dart'; // Import the LoginScreen
 
 class HomeScreen extends StatelessWidget {
+  Future<void> _logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear saved username & password
+
+    // Navigate back to login screen
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (route) => false, // Remove all previous routes
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,6 +81,16 @@ class HomeScreen extends StatelessWidget {
               label: Text('Profile'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
+                minimumSize: Size(double.infinity, 50),
+              ),
+            ),
+            Spacer(), // Pushes the logout button to the bottom
+            ElevatedButton.icon(
+              onPressed: () => _logout(context),
+              icon: Icon(LucideIcons.logOut),
+              label: Text('Logout'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
                 minimumSize: Size(double.infinity, 50),
               ),
             ),
